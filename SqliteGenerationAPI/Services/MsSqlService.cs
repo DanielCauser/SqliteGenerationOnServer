@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SqliteGenerationAPI.Services
 {
-    public class MsSqlService
+    public class MsSqlService : IMsSqlService
     {
         public MsSqlService()
         {

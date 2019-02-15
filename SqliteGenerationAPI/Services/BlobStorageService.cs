@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SqliteGenerationAPI.Services
 {
-    public class BlobStorageService
+    public class BlobStorageService : IBlobStorageService
     {
         public BlobStorageService()
         {
