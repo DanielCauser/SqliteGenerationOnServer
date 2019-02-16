@@ -21,7 +21,8 @@ namespace SqliteGenerationAPI.Controllers
 
         public readonly IMsSqlService _msSqlService;
 
-        public DataController(DataContext dbContext, IMsSqlService msSqlService)
+        public DataController(DataContext dbContext, 
+            IMsSqlService msSqlService)
         {
             _dbContext = dbContext;
             _msSqlService = msSqlService;
@@ -38,7 +39,7 @@ namespace SqliteGenerationAPI.Controllers
         public string GenerateSqlite()
         {
 
-            var list = _msSqlService.QueryDataFromMsSql();
+            var propertiesAndData = _msSqlService.QueryDataFromMsSql();
 
             return "value";
         }

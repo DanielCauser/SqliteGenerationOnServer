@@ -23,19 +23,18 @@ namespace SqliteGenerationAPI.Services
         }
 
 
-        public IEnumerable<TodoItem> QueryDataFromMsSql()
+        public Tuple<List<PropertyInfo>, List<TodoItem>> QueryDataFromMsSql()
         {
-            List<TodoItem> list;
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("TodoContext"));
             _mssql = sqlConnection;
             _mssql.Open();
             string sql = "SELECT * FROM TodoItems ";
             var cmd = new SqlCommand(sql, (SqlConnection)_mssql);
             var reader = cmd.ExecuteReader();
-            list = DataReaderMapToList<TodoItem>(reader, out var propertiesToCreateInSqlite);
+            var list = DataReaderMapToList<TodoItem>(reader, out var propertiesToCreateInSqlite);
             reader.Close();
             cmd.Dispose();
-            return list;
+            return Tuple.Create(propertiesToCreateInSqlite, list);
         }
 
         private List<TodoItem> DataReaderMapToList<TodoItem>(IDataReader dr, out List<PropertyInfo> propertiesToCreateInSqlite)
