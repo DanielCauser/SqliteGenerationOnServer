@@ -14,14 +14,20 @@ namespace SqliteGenerationAPI.Services
 {
     public class MsSqlService : IMsSqlService
     {
-        private readonly DbConnection _connection;
+        private readonly IConfiguration _configuration;
         private IDbConnection _mssql;
+
+        public MsSqlService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
 
         public IEnumerable<TodoItem> QueryDataFromMsSql()
         {
             List<TodoItem> list;
-            _mssql = new SqlConnection("");
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("TodoContext"));
+            _mssql = sqlConnection;
             _mssql.Open();
             string sql = "SELECT * FROM TodoItems ";
             var cmd = new SqlCommand(sql, (SqlConnection)_mssql);
