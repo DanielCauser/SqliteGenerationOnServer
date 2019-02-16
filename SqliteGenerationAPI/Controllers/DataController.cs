@@ -25,20 +25,6 @@ namespace SqliteGenerationAPI.Controllers
         {
             _dbContext = dbContext;
             _msSqlService = msSqlService;
-            if (_dbContext.TodoItems.Count() == 0)
-            {
-                // Seed
-                var list = new List<TodoItem>();
-
-                using (var reader = new StreamReader(Assembly.GetAssembly(typeof(Startup))
-                                                               .GetManifestResourceStream(Assembly.GetAssembly(typeof(Startup)).GetManifestResourceNames().First()) ?? throw new InvalidOperationException()))
-                {
-                    list = JsonConvert.DeserializeObject<List<TodoItem>>(reader.ReadToEnd());
-                }
-
-                _dbContext.TodoItems.AddRange(list);
-                _dbContext.SaveChanges();
-            }
         }
 
         // GET: api/Todo
