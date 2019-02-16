@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SqliteGenerationAPI.Datas;
+using SqliteGenerationAPI.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,9 +19,12 @@ namespace SqliteGenerationAPI.Controllers
     {
         private readonly DataContext _dbContext;
 
-        public DataController(DataContext dbContext)
+        public readonly IMsSqlService _msSqlService;
+
+        public DataController(DataContext dbContext, IMsSqlService msSqlService)
         {
             _dbContext = dbContext;
+            _msSqlService = msSqlService;
             if (_dbContext.TodoItems.Count() == 0)
             {
                 // Seed
@@ -47,6 +51,9 @@ namespace SqliteGenerationAPI.Controllers
         [HttpGet("GenerateSqlite")]
         public string GenerateSqlite()
         {
+
+            var list = _msSqlService.QueryDataFromMsSql();
+
             return "value";
         }
     }

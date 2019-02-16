@@ -31,7 +31,7 @@ namespace SqliteGenerationAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(opt =>
-                opt.UseInMemoryDatabase("TodoList"));
+                opt.UseInMemoryDatabase("LocalItems"));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
