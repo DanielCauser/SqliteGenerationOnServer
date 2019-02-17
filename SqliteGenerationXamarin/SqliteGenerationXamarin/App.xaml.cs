@@ -4,6 +4,11 @@ using SqliteGenerationXamarin.ViewModels;
 using SqliteGenerationXamarin.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using SqliteGenerationXamarin.Services;
+using Prism.Autofac;
+using Autofac;
+using Acr.UserDialogs;
+using Plugin.HttpTransferTasks;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace SqliteGenerationXamarin
@@ -30,6 +35,16 @@ namespace SqliteGenerationXamarin
         {
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
+
+            containerRegistry.RegisterSingleton<ISQLiteFactory, SQLiteFactory>();
+        }
+
+        protected override IContainerExtension CreateContainerExtension()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register(_ => UserDialogs.Instance).As<IUserDialogs>().SingleInstance();
+            builder.Register(_ => CrossHttpTransfers.Current).As<IHttpTransferTasks>().SingleInstance();
+            return new AutofacContainerExtension(builder);
         }
     }
 }
