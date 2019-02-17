@@ -7,6 +7,8 @@
     <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
         <Button Text="Download Sqlite"
                 Command="{Binding DownloadSqliteCommand}"/>
+        <Button Text="Delete Sqlite file"
+                Command="{Binding DeleteSqliteCommand}"/>
         
     </StackLayout>
     

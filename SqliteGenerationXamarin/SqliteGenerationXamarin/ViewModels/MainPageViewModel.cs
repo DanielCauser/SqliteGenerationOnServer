@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using SqliteGenerationXamarin.Services;
 using System.Reactive;
 using Xamarin.Forms;
+using System.IO;
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -49,6 +50,8 @@ namespace SqliteGenerationXamarin.ViewModels
 
                 IsDownloading = false;
             }, this.WhenAny(x => x.IsDownloading, (isDownloading) => !isDownloading.GetValue()));
+
+            this.DeleteSqliteCommand = ReactiveCommand.Create(_sqliteFactory.DeleteSqliteFile);
         }
 
         public override void OnAppearing()
@@ -62,5 +65,6 @@ namespace SqliteGenerationXamarin.ViewModels
         [Reactive] public bool IsLoadingData { get; private set; }
 
         public ICommand DownloadSqliteCommand { get; }
+        public ICommand DeleteSqliteCommand { get; }
     }
 }

@@ -35,7 +35,7 @@ namespace SqliteGenerationXamarin.Services
                 while (!DownloadCompleted)
                 {
                     _messageUpdateAction($"Downloading db - {DownloadSqliteTask.PercentComplete}%");
-                    await Task.Delay(100);
+                    await Task.Delay(10);
                 }
             }
         }
@@ -64,10 +64,15 @@ namespace SqliteGenerationXamarin.Services
             {
                 if (DownloadSqliteTask.Status == Plugin.HttpTransferTasks.TaskStatus.Completed)
                 {
-                    //_fileService.MoveFile(DownloadSqliteTask.LocalFilePath, Path.Combine(_fileService.PersonalPath, Constants.SyncStoreName));
-                    //DownloadCompleted = true;
+                    File.Move(DownloadSqliteTask.LocalFilePath, _databasePath);
+                    DownloadCompleted = true;
                 }
             };
+        }
+
+        public void DeleteSqliteFile()
+        {
+            File.Delete(_databasePath);
         }
     }
 }
