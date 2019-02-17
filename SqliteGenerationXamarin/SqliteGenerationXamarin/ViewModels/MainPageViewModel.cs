@@ -34,20 +34,18 @@ namespace SqliteGenerationXamarin.ViewModels
             {
                 IsDownloading = true;
                 // SHOW USER DIALOG TO SHOW DOWNLOAD PROCESS
-                string StatusMessage = "Loading";
-                using (this._userDialogs.Loading(StatusMessage))
+
+                using (var dlg = this._userDialogs.Loading("Preparing to download..."))
                 {
                     // START DOWNLOAD
                     await _sqliteFactory.DownloadSqlite((status) =>
                     {
                         Device.BeginInvokeOnMainThread(() =>
                         {
-                            StatusMessage = status;
+                            dlg.Title = status;
                         });
                     }).ConfigureAwait(false);
                 }
-
-
 
                 IsDownloading = false;
             }, this.WhenAny(x => x.IsDownloading, (isDownloading) => !isDownloading.GetValue()));
