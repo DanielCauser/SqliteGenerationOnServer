@@ -21,14 +21,17 @@ namespace SqliteGenerationAPI.Controllers
 
         public readonly IMsSqlService _msSqlService;
         private readonly ISqliteCreationService _sqliteCreationService;
+        private readonly IBlobStorageService _storageService;
 
         public DataController(DataContext dbContext, 
             IMsSqlService msSqlService,
-            ISqliteCreationService sqliteCreationService)
+            ISqliteCreationService sqliteCreationService,
+            IBlobStorageService storageService)
         {
             _dbContext = dbContext;
             _msSqlService = msSqlService;
             _sqliteCreationService = sqliteCreationService;
+            _storageService = storageService;
         }
 
         // GET: api/Todo
@@ -39,7 +42,7 @@ namespace SqliteGenerationAPI.Controllers
         }
 
         [HttpGet("GenerateSqlite")]
-        public string GenerateSqlite()
+        public async Task<ActionResult<string>> GenerateSqlite()
         {
             // 1 - Fetch Data from MsSql
             // 2 - Define columns(Class properties) that will be created in Sqlite
@@ -49,10 +52,14 @@ namespace SqliteGenerationAPI.Controllers
             // 4 - Create Tables
             // 5 - Insert Data
             var sqliteFile = _sqliteCreationService.CreateSqliteTableAndPopulateDb(propertiesAndData);
-            sqliteFile.Close();
-            // 6 - Upload file to BlobStorage
 
-            return "value";
+            // 6 - Upload file to BlobStorage
+            var downloadUrl = await _storageService.UploadBlobAsync("sqlitefile", "Todo.db",
+                "application/octet-stream", sqliteFile);
+
+            sqliteFile.Close();
+
+            return downloadUrl;
         }
     }
 }
