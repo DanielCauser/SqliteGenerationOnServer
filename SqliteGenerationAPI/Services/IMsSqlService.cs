@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
-using SqliteGenerationAPI.Datas;
+using SqliteGeneration.Core;
 
 namespace SqliteGenerationAPI.Services
 {

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using SqliteGeneration.Core;
 
-namespace SqliteGenerationAPI.Datas
+namespace SqliteGenerationAPI.DataAccess
 {
     public class DataContext : DbContext
     {

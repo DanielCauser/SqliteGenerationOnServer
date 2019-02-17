@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using SqliteGenerationAPI.Datas;
 using SQLite;
+using SqliteGeneration.Core;
 
 namespace SqliteGenerationAPI.Services
 {

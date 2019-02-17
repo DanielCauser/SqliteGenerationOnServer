@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SqliteGenerationAPI.Datas;
+using SqliteGenerationAPI.DataAccess;
 using SqliteGenerationAPI.Services;
 using Swashbuckle.AspNetCore.Swagger;
 

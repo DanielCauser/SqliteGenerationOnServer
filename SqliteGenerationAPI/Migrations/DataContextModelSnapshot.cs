@@ -3,8 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SqliteGenerationAPI.Datas;
+using SqliteGenerationAPI.DataAccess;
 
 namespace SqliteGenerationAPI.Migrations
 {

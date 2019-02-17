@@ -3,13 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SqliteGenerationXamarin.Views.MainPage"
              Title="{Binding Title}">
-
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-        <Button Text="Download Sqlite"
-                Command="{Binding DownloadSqliteCommand}"/>
-        <Button Text="Delete Sqlite file"
-                Command="{Binding DeleteSqliteCommand}"/>
-        
-    </StackLayout>
     
+    <StackLayout>
+        <StackLayout HorizontalOptions="Center" VerticalOptions="Start" Orientation="Horizontal">
+            <Button Text="Download Sqlite"
+                    Command="{Binding DownloadSqliteCommand}"/>
+            <Button Text="Delete Sqlite file"
+                    Command="{Binding DeleteSqliteCommand}"/>
+        </StackLayout>
+
+        <ListView ItemsSource="{Binding Todos}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                         <Label Text="{Binding Name}"/>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
 </ContentPage>

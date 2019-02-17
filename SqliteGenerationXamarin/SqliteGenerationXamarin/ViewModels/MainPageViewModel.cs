@@ -14,6 +14,13 @@ using SqliteGenerationXamarin.Services;
 using System.Reactive;
 using Xamarin.Forms;
 using System.IO;
+using SqliteGeneration.Core;
+using System.Reactive.Concurrency;
+using System.Collections.ObjectModel;
+using DynamicData;
+using ReactiveUI.Legacy;
+using DynamicData.Binding;
+using DynamicData.Diagnostics;
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -21,6 +28,8 @@ namespace SqliteGenerationXamarin.ViewModels
     {
         private readonly ISQLiteFactory _sqliteFactory;
         private readonly IUserDialogs _userDialogs;
+        IScheduler mainThreadScheduler;
+
 
         public MainPageViewModel(INavigationService navigationService,
                                     ISQLiteFactory sqliteFactory,
@@ -31,25 +40,32 @@ namespace SqliteGenerationXamarin.ViewModels
 
             _sqliteFactory = sqliteFactory;
             _userDialogs = userDialogs;
-            this.DownloadSqliteCommand = ReactiveCommand.CreateFromTask( async () =>
-            {
-                IsDownloading = true;
-                // SHOW USER DIALOG TO SHOW DOWNLOAD PROCESS
+            Todos = new List<TodoItem>();
 
-                using (var dlg = this._userDialogs.Loading("Preparing to download..."))
-                {
-                    // START DOWNLOAD
-                    await _sqliteFactory.DownloadSqlite((status) =>
-                    {
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            dlg.Title = status;
-                        });
-                    }).ConfigureAwait(false);
-                }
+            this.DownloadSqliteCommand = ReactiveCommand.CreateFromTask(async () =>
+           {
+               IsDownloading = true;
+               // SHOW USER DIALOG TO SHOW DOWNLOAD PROCESS
 
-                IsDownloading = false;
-            }, this.WhenAny(x => x.IsDownloading, (isDownloading) => !isDownloading.GetValue()));
+               using (var dlg = this._userDialogs.Loading("Preparing to download..."))
+               {
+                   // START DOWNLOAD
+                   await _sqliteFactory.DownloadSqlite((status) =>
+                  {
+                      Device.BeginInvokeOnMainThread(() =>
+                      {
+                          dlg.Title = status;
+                      });
+                  }).ConfigureAwait(false);
+
+                   dlg.Title = "Getting data from Sqilte";
+
+                   var data = _sqliteFactory.FetchTodoData();
+                   Todos = data;
+               }
+
+               IsDownloading = false;
+           }, this.WhenAny(x => x.IsDownloading, (isDownloading) => !isDownloading.GetValue()));
 
             this.DeleteSqliteCommand = ReactiveCommand.Create(_sqliteFactory.DeleteSqliteFile);
         }
@@ -57,14 +73,15 @@ namespace SqliteGenerationXamarin.ViewModels
         public override void OnAppearing()
         {
             base.OnAppearing();
-            IsLoadingData = false;
             IsDownloading = false;
         }
 
         [Reactive] public bool IsDownloading { get; private set; }
-        [Reactive] public bool IsLoadingData { get; private set; }
+        [Reactive] public List<TodoItem> Todos { get; private set; }
 
         public ICommand DownloadSqliteCommand { get; }
         public ICommand DeleteSqliteCommand { get; }
+
+
     }
 }

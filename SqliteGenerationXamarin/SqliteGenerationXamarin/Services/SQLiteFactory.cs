@@ -5,6 +5,9 @@ using Plugin.HttpTransferTasks;
 using ReactiveUI.Fody.Helpers;
 using System.Net.Http;
 using HttpTracer;
+using SqliteGeneration.Core;
+using System.Collections.Generic;
+using SQLite;
 
 namespace SqliteGenerationXamarin.Services
 {
@@ -15,9 +18,9 @@ namespace SqliteGenerationXamarin.Services
         private readonly IHttpTransferTasks _httpTransferTask;
         private IHttpTask DownloadSqliteTask { get; set; }
 
-        bool DoesLocalDbExists => File.Exists(_databasePath);
+        [Reactive] public bool DoesLocalDbExists => File.Exists(_databasePath);
 
-        [Reactive] public bool DownloadCompleted { get; private set; }
+        bool DownloadCompleted { get; set; }
 
         public SQLiteFactory(IHttpTransferTasks httpTransferTask)
         {
@@ -73,6 +76,17 @@ namespace SqliteGenerationXamarin.Services
         public void DeleteSqliteFile()
         {
             File.Delete(_databasePath);
+        }
+
+        public List<TodoItem> FetchTodoData()
+        {
+            if(DoesLocalDbExists)
+            {
+                var db = new SQLiteConnection(_databasePath, true);
+                var result = db.Query<TodoItem>("select * from TodoItem");
+                return result;
+            }
+            return new List<TodoItem>();
         }
     }
 }

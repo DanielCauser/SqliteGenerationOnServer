@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using SqliteGenerationAPI.Datas;
-using System.Linq;
 using System.Data;
 using System.Reflection;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
+using SqliteGeneration.Core;
 
 namespace SqliteGenerationAPI.Services
 {
