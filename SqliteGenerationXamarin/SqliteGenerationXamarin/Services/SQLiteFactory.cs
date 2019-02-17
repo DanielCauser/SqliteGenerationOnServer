@@ -16,10 +16,9 @@ namespace SqliteGenerationXamarin.Services
         private Action<string> _messageUpdateAction;
         private readonly string _databasePath;
         private readonly IHttpTransferTasks _httpTransferTask;
+
         private IHttpTask DownloadSqliteTask { get; set; }
-
-        [Reactive] public bool DoesLocalDbExists => File.Exists(_databasePath);
-
+        public bool DoesLocalDbExists => File.Exists(_databasePath);
         bool DownloadCompleted { get; set; }
 
         public SQLiteFactory(IHttpTransferTasks httpTransferTask)

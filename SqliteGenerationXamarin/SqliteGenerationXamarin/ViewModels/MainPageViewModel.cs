@@ -1,26 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+﻿using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Windows.Input;
-using Acr.Collections;
 using Acr.UserDialogs;
 using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
-using SqliteGenerationXamarin.Services;
-using System.Reactive;
-using Xamarin.Forms;
-using System.IO;
 using SqliteGeneration.Core;
-using System.Reactive.Concurrency;
-using System.Collections.ObjectModel;
-using DynamicData;
-using ReactiveUI.Legacy;
-using DynamicData.Binding;
-using DynamicData.Diagnostics;
+using SqliteGenerationXamarin.Services;
+using Xamarin.Forms;
+using System.Reactive.Linq;
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -28,8 +16,6 @@ namespace SqliteGenerationXamarin.ViewModels
     {
         private readonly ISQLiteFactory _sqliteFactory;
         private readonly IUserDialogs _userDialogs;
-        IScheduler mainThreadScheduler;
-
 
         public MainPageViewModel(INavigationService navigationService,
                                     ISQLiteFactory sqliteFactory,
@@ -58,30 +44,50 @@ namespace SqliteGenerationXamarin.ViewModels
                       });
                   }).ConfigureAwait(false);
 
-                   dlg.Title = "Getting data from Sqilte";
-
-                   var data = _sqliteFactory.FetchTodoData();
-                   Todos = data;
+                   Device.BeginInvokeOnMainThread(() =>
+                   {
+                       Todos = _sqliteFactory.FetchTodoData();
+                       DoesLocalDbExists = true;
+                       IsDownloading = false;
+                   });
                }
+           }, this.WhenAny(
+                    x => x.IsDownloading,
+                    x => x.DoesLocalDbExists,
+                    (isDownloading, doesLocalDbExists) => 
+                        isDownloading.GetValue() ||
+                        !doesLocalDbExists.GetValue()));
 
-               IsDownloading = false;
-           }, this.WhenAny(x => x.IsDownloading, (isDownloading) => !isDownloading.GetValue()));
+            this.DeleteSqliteCommand = ReactiveCommand.Create(() =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Todos = new List<TodoItem>();
+                    _sqliteFactory.DeleteSqliteFile();
+                    DoesLocalDbExists = false;
+                });
+            }, this.WhenAny(
+                    x => x.DoesLocalDbExists,
+                    (doesLocalDbExists) =>
+                        doesLocalDbExists.GetValue()));
 
-            this.DeleteSqliteCommand = ReactiveCommand.Create(_sqliteFactory.DeleteSqliteFile);
+            ResfreshCommand = ReactiveCommand.Create(() => { Todos = _sqliteFactory.FetchTodoData(); });
+
         }
 
-        public override void OnAppearing()
+        public override void OnNavigatedTo(INavigationParameters parameters)
         {
-            base.OnAppearing();
             IsDownloading = false;
+            Todos = _sqliteFactory.FetchTodoData();
+            DoesLocalDbExists = _sqliteFactory.DoesLocalDbExists;
         }
 
         [Reactive] public bool IsDownloading { get; private set; }
+        [Reactive] public bool DoesLocalDbExists { get; private set; }
         [Reactive] public List<TodoItem> Todos { get; private set; }
 
         public ICommand DownloadSqliteCommand { get; }
         public ICommand DeleteSqliteCommand { get; }
-
-
+        public ICommand ResfreshCommand { get; }
     }
 }

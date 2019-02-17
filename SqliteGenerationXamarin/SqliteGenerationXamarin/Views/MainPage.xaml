@@ -4,7 +4,7 @@
              x:Class="SqliteGenerationXamarin.Views.MainPage"
              Title="{Binding Title}">
     
-    <StackLayout>
+    <StackLayout Margin="10">
         <StackLayout HorizontalOptions="Center" VerticalOptions="Start" Orientation="Horizontal">
             <Button Text="Download Sqlite"
                     Command="{Binding DownloadSqliteCommand}"/>
@@ -12,11 +12,15 @@
                     Command="{Binding DeleteSqliteCommand}"/>
         </StackLayout>
 
-        <ListView ItemsSource="{Binding Todos}">
+        <ListView ItemsSource="{Binding Todos}"
+                  RefreshCommand="{Binding ResfreshCommand}"
+                  IsPullToRefreshEnabled="true">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                         <Label Text="{Binding Name}"/>
+                         <Label Text="{Binding Name}"
+                                VerticalTextAlignment="Center"
+                                HorizontalOptions="Start"/>
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
