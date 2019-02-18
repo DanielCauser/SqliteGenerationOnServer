@@ -9,6 +9,7 @@ using SqliteGeneration.Core;
 using SqliteGenerationXamarin.Services;
 using Xamarin.Forms;
 using System.Reactive.Linq;
+using System.Reactive;
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -44,35 +45,33 @@ namespace SqliteGenerationXamarin.ViewModels
                       });
                   }).ConfigureAwait(false);
 
-                   Device.BeginInvokeOnMainThread(() =>
-                   {
-                       Todos = _sqliteFactory.FetchTodoData();
-                       DoesLocalDbExists = true;
-                       IsDownloading = false;
-                   });
+                   Todos = _sqliteFactory.FetchTodoData();
                }
+
+               Device.BeginInvokeOnMainThread(() =>
+               {
+                   DoesLocalDbExists = true;
+                   IsDownloading = false;
+               });
+
            }, this.WhenAny(
                     x => x.IsDownloading,
                     x => x.DoesLocalDbExists,
-                    (isDownloading, doesLocalDbExists) => 
+                    (isDownloading, doesLocalDbExists) =>
                         isDownloading.GetValue() ||
                         !doesLocalDbExists.GetValue()));
 
             this.DeleteSqliteCommand = ReactiveCommand.Create(() =>
             {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    Todos = new List<TodoItem>();
-                    _sqliteFactory.DeleteSqliteFile();
-                    DoesLocalDbExists = false;
-                });
+                Todos = new List<TodoItem>();
+                _sqliteFactory.DeleteSqliteFile();
+                DoesLocalDbExists = false;
             }, this.WhenAny(
                     x => x.DoesLocalDbExists,
                     (doesLocalDbExists) =>
                         doesLocalDbExists.GetValue()));
 
             ResfreshCommand = ReactiveCommand.Create(() => { Todos = _sqliteFactory.FetchTodoData(); });
-
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
