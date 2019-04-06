@@ -13,6 +13,7 @@
     <PackageReference Include="ReactiveUI.XamForms" Version="9.10.7" />
     <PackageReference Include="ReactiveUI.Fody" Version="9.10.7" />
     <PackageReference Include="HttpTracer" Version="1.0.2" />
+    <PackageReference Include="Humanizer" Version="2.6.2" />
   </ItemGroup>
 
   <ItemGroup>

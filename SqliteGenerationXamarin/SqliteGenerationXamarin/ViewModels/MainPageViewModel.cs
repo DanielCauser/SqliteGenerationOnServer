@@ -10,6 +10,9 @@ using SqliteGenerationXamarin.Services;
 using Xamarin.Forms;
 using System.Reactive.Linq;
 using System.Reactive;
+using System;
+using Humanizer;
+
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -29,37 +32,64 @@ namespace SqliteGenerationXamarin.ViewModels
             _userDialogs = userDialogs;
             Todos = new List<TodoItem>();
 
-            this.DownloadSqliteCommand = ReactiveCommand.CreateFromTask(async () =>
-           {
-               IsDownloading = true;
-               // SHOW USER DIALOG TO SHOW DOWNLOAD PROCESS
 
-               using (var dlg = this._userDialogs.Loading("Preparing to download..."))
-               {
-                   // START DOWNLOAD
-                   await _sqliteFactory.DownloadSqlite((status) =>
-                  {
-                      Device.BeginInvokeOnMainThread(() =>
-                      {
-                          dlg.Title = status;
-                      });
-                  }).ConfigureAwait(false);
+            this.DownloadSqliteCommand = ReactiveCommand.Create(() =>
+            {
+                var dlg = this._userDialogs.Progress("Preparing to download...");
+                _sqliteFactory
+                    .DownloadSomeShit()
+                    .Subscribe
+                    (
+                        x => {
 
-                   Todos = _sqliteFactory.FetchTodoData();
-               }
+                            var kbs = x.DownloadSpeedBytes.Kilobytes();
+                            var mins = x.TimeLeft.Humanize();
 
-               Device.BeginInvokeOnMainThread(() =>
-               {
-                   DoesLocalDbExists = true;
-                   IsDownloading = false;
-               });
+                            dlg.Title = $"Mins Left: {mins} - {kbs} kb/s";
+                            dlg.PercentComplete = Convert.ToInt32(x.Progress);
+                        },
+                        ex => {
+                            dlg.Dispose();
+                            _userDialogs.Alert(ex.ToString(), "Fuck off shahab");
+                        },
+                        () => {
+                            dlg.Dispose();
+                            _userDialogs.Alert("FUCK YA");
+                            //Todos = _sqliteFactory.FetchTodoData();
+                        }
+                    );
+            });
+           // this.DownloadSqliteCommand = ReactiveCommand.CreateFromTask(async () =>
+           //{
+           //    IsDownloading = true;
+           //    // SHOW USER DIALOG TO SHOW DOWNLOAD PROCESS
 
-           }, this.WhenAny(
-                    x => x.IsDownloading,
-                    x => x.DoesLocalDbExists,
-                    (isDownloading, doesLocalDbExists) =>
-                        isDownloading.GetValue() ||
-                        !doesLocalDbExists.GetValue()));
+           //    using (var dlg = this._userDialogs.Loading("Preparing to download..."))
+           //    {
+           //        // START DOWNLOAD
+           //        await _sqliteFactory.DownloadSqlite((status) =>
+           //       {
+           //           Device.BeginInvokeOnMainThread(() =>
+           //           {
+           //               dlg.Title = status;
+           //           });
+           //       }).ConfigureAwait(false);
+
+           //        Todos = _sqliteFactory.FetchTodoData();
+           //    }
+
+           //    Device.BeginInvokeOnMainThread(() =>
+           //    {
+           //        DoesLocalDbExists = true;
+           //        IsDownloading = false;
+           //    });
+
+           //}, this.WhenAny(
+                    //x => x.IsDownloading,
+                    //x => x.DoesLocalDbExists,
+                    //(isDownloading, doesLocalDbExists) =>
+                        //isDownloading.GetValue() ||
+                        //!doesLocalDbExists.GetValue()));
 
             this.DeleteSqliteCommand = ReactiveCommand.Create(() =>
             {

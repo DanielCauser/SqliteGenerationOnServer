@@ -11,5 +11,7 @@ namespace SqliteGenerationXamarin.Services
         Task DownloadSqlite(Action<string> messageUpdateAction);
         void DeleteSqliteFile();
         List<TodoItem> FetchTodoData();
+
+        IObservable<Download> DownloadSomeShit();
     }
 }
