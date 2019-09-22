@@ -43,13 +43,14 @@ namespace SqliteGenerationXamarin.ViewModels
                       {
                           dlg.Title = status;
                       });
-                  }).ConfigureAwait(false);
 
-                   Todos = _sqliteFactory.FetchTodoData();
+                  }).ConfigureAwait(false);
                }
 
                Device.BeginInvokeOnMainThread(() =>
                {
+                   Todos.Clear();
+                   Todos = _sqliteFactory.FetchTodoData();
                    DoesLocalDbExists = true;
                    IsDownloading = false;
                });
@@ -71,7 +72,11 @@ namespace SqliteGenerationXamarin.ViewModels
                     (doesLocalDbExists) =>
                         doesLocalDbExists.GetValue()));
 
-            ResfreshCommand = ReactiveCommand.Create(() => { Todos = _sqliteFactory.FetchTodoData(); });
+            ResfreshCommand = ReactiveCommand.Create(() =>
+            {
+                Todos.Clear();
+                Todos = _sqliteFactory.FetchTodoData();
+            });
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)

@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SqliteGeneration.Core;
 using SqliteGenerationAPI.DataAccess;
 using SqliteGenerationAPI.Services;
@@ -34,6 +39,21 @@ namespace SqliteGenerationAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
+            if (!await _dbContext.TodoItems.AnyAsync())
+            {
+                // Seed
+                var list = new List<TodoItem>();
+
+                using (var reader = new StreamReader(Assembly.GetAssembly(typeof(Startup))
+                                                         .GetManifestResourceStream(Assembly.GetAssembly(typeof(Startup)).GetManifestResourceNames().First()) ?? throw new InvalidOperationException()))
+                {
+                    list = JsonConvert.DeserializeObject<List<TodoItem>>(reader.ReadToEnd());
+                }
+
+                await _dbContext.TodoItems.AddRangeAsync(list);
+                await _dbContext.SaveChangesAsync();
+            }
+
             return await _dbContext.TodoItems.ToListAsync();
         }
 
