@@ -8,6 +8,7 @@
     <Folder Include="wwwroot\" />
     <Folder Include="DataAccess\" />
     <Folder Include="Services\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
