@@ -38,9 +38,7 @@ namespace SqliteGenerationAPI
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "My API", Version = "v1"}); });
 
             services.AddTransient<IBlobStorageService, BlobStorageService>();
-            services.AddTransient<IMsSqlService, MsSqlService>();
-            services.AddTransient<ISqliteCreationService, SqliteCreationService>();
-
+            services.AddTransient<IMsSqlToSqlite, MsSqlToSqlite>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
