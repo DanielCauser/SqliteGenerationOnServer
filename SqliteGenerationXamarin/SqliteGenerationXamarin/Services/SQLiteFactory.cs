@@ -49,7 +49,8 @@ namespace SqliteGenerationXamarin.Services
             HttpResponseMessage result;
             using (HttpClient client = new HttpClient(new HttpTracerHandler()))
             {
-                result = await client.GetAsync("http://10.211.55.3:49787/api/data/generateSqlite");
+                //result = await client.GetAsync("http://10.211.55.3:49787/api/data/generateSqlite");
+                result = await client.GetAsync("https://causerdemomassive.azurewebsites.net/api/data/generateSqlite");
             }
 
             if (result.IsSuccessStatusCode)
