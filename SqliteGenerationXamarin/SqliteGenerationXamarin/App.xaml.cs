@@ -36,7 +36,7 @@ namespace SqliteGenerationXamarin
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
 
-            containerRegistry.RegisterSingleton<ISQLiteFactory, SQLiteFactory>();
+            containerRegistry.Register<ISQLiteFactory, SQLiteFactory>();
         }
 
         protected override IContainerExtension CreateContainerExtension()

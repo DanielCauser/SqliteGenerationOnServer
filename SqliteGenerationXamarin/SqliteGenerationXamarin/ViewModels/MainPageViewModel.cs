@@ -51,6 +51,7 @@ namespace SqliteGenerationXamarin.ViewModels
 
                this.DoesLocalDbExists = true;
                this.IsDownloading = false;
+               await this.ResfreshCommand.Execute().ToTask();
 
            }, this.WhenAny(
                     x => x.IsDownloading,
@@ -86,6 +87,7 @@ namespace SqliteGenerationXamarin.ViewModels
         {
             this.IsDownloading = false;
             this.DoesLocalDbExists = _sqliteFactory.DoesLocalDbExists;
+            this.ResfreshCommand.Execute();
         }
 
         [Reactive] public bool IsDownloading { get; private set; }

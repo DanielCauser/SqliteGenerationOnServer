@@ -41,6 +41,8 @@ namespace SqliteGenerationXamarin.Services
                     await Task.Delay(10);
                 }
             }
+
+            DownloadCompleted = false;
         }
 
         private async Task<string> RequestSqliteGenerationAndDownloadUrl()
