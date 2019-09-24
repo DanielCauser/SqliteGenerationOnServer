@@ -8,6 +8,7 @@ using HttpTracer;
 using SqliteGeneration.Core;
 using System.Collections.Generic;
 using SQLite;
+using System.ComponentModel;
 
 namespace SqliteGenerationXamarin.Services
 {
@@ -62,15 +63,18 @@ namespace SqliteGenerationXamarin.Services
         private void DownloadSqliteFile(string downloadUrl)
         {
             DownloadSqliteTask = _httpTransferTask.Download(downloadUrl.Replace("\"", ""));
+            DownloadSqliteTask.PropertyChanged -= Handler;
+            DownloadSqliteTask.PropertyChanged += Handler;
+        }
 
-            DownloadSqliteTask.PropertyChanged += (sender, args) =>
+        private void Handler(object sender, PropertyChangedEventArgs e)
+        {
+            if (DownloadSqliteTask.Status == Plugin.HttpTransferTasks.TaskStatus.Completed)
             {
-                if (DownloadSqliteTask.Status == Plugin.HttpTransferTasks.TaskStatus.Completed)
-                {
-                    File.Move(DownloadSqliteTask.LocalFilePath, _databasePath);
-                    DownloadCompleted = true;
-                }
-            };
+                File.Move(DownloadSqliteTask.LocalFilePath, _databasePath);
+                File.Delete(DownloadSqliteTask.LocalFilePath);
+                DownloadCompleted = true;
+            }
         }
 
         public void DeleteSqliteFile()
@@ -78,12 +82,12 @@ namespace SqliteGenerationXamarin.Services
             File.Delete(_databasePath);
         }
 
-        public List<TodoItem> FetchTodoData()
+        public async Task<List<TodoItem>> FetchTodoData()
         {
             if(DoesLocalDbExists)
             {
-                var db = new SQLiteConnection(_databasePath, true);
-                var result = db.Query<TodoItem>("select * from TodoItem");
+                var db = new SQLiteAsyncConnection(_databasePath, true);
+                var result = await db.QueryAsync<TodoItem>("select * from TodoItem");
                 return result;
             }
             return new List<TodoItem>();

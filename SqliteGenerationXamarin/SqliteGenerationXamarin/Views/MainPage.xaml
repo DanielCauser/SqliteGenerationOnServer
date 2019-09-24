@@ -14,7 +14,8 @@
 
         <ListView ItemsSource="{Binding Todos}"
                   RefreshCommand="{Binding ResfreshCommand}"
-                  IsPullToRefreshEnabled="true">
+                  IsPullToRefreshEnabled="true"
+                  IsRefreshing="{Binding IsRefreshing}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>

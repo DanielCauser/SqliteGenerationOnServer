@@ -10,6 +10,6 @@ namespace SqliteGenerationXamarin.Services
         bool DoesLocalDbExists { get; }
         Task DownloadSqlite(Action<string> messageUpdateAction);
         void DeleteSqliteFile();
-        List<TodoItem> FetchTodoData();
+        Task<List<TodoItem>> FetchTodoData();
     }
 }

@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Reactive.Concurrency;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
+using DynamicData;
 using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SqliteGeneration.Core;
 using SqliteGenerationXamarin.Services;
 using Xamarin.Forms;
-using System.Reactive.Linq;
-using System.Reactive;
 
 namespace SqliteGenerationXamarin.ViewModels
 {
@@ -43,17 +46,11 @@ namespace SqliteGenerationXamarin.ViewModels
                       {
                           dlg.Title = status;
                       });
-
-                  }).ConfigureAwait(false);
+                  });
                }
 
-               Device.BeginInvokeOnMainThread(() =>
-               {
-                   Todos.Clear();
-                   Todos = _sqliteFactory.FetchTodoData();
-                   DoesLocalDbExists = true;
-                   IsDownloading = false;
-               });
+               this.DoesLocalDbExists = true;
+               this.IsDownloading = false;
 
            }, this.WhenAny(
                     x => x.IsDownloading,
@@ -64,34 +61,40 @@ namespace SqliteGenerationXamarin.ViewModels
 
             this.DeleteSqliteCommand = ReactiveCommand.Create(() =>
             {
-                Todos = new List<TodoItem>();
                 _sqliteFactory.DeleteSqliteFile();
                 DoesLocalDbExists = false;
+                Todos = new List<TodoItem>();
+
             }, this.WhenAny(
                     x => x.DoesLocalDbExists,
                     (doesLocalDbExists) =>
                         doesLocalDbExists.GetValue()));
 
-            ResfreshCommand = ReactiveCommand.Create(() =>
+            ResfreshCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                Todos.Clear();
-                Todos = _sqliteFactory.FetchTodoData();
+                IsRefreshing = true;
+                Todos = await _sqliteFactory.FetchTodoData();
+                IsRefreshing = false;
             });
+
+            this.WhenAnyValue(x => x.Todos)
+                .SubOnMainThread(todos => Todos = todos);
         }
+        
 
         public override void OnNavigatedTo(INavigationParameters parameters)
         {
-            IsDownloading = false;
-            Todos = _sqliteFactory.FetchTodoData();
-            DoesLocalDbExists = _sqliteFactory.DoesLocalDbExists;
+            this.IsDownloading = false;
+            this.DoesLocalDbExists = _sqliteFactory.DoesLocalDbExists;
         }
 
         [Reactive] public bool IsDownloading { get; private set; }
+        [Reactive] public bool IsRefreshing { get; private set; }
         [Reactive] public bool DoesLocalDbExists { get; private set; }
         [Reactive] public List<TodoItem> Todos { get; private set; }
 
-        public ICommand DownloadSqliteCommand { get; }
+        public ReactiveCommand<Unit, Unit> DownloadSqliteCommand { get; }
         public ICommand DeleteSqliteCommand { get; }
-        public ICommand ResfreshCommand { get; }
+        public ReactiveCommand<Unit, Unit> ResfreshCommand { get; }
     }
 }
