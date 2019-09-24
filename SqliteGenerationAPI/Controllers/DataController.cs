@@ -57,6 +57,10 @@ namespace SqliteGenerationAPI.Controllers
         [HttpGet("GenerateSqlite")]
         public async Task<ActionResult<string>> GenerateSqlite()
         {
+            var result = await _storageService.BlobExistsAsync("sqlitefile", "Todo.db");
+            if (result.exists)
+                return result.url;
+
             var sqliteFile = _msSqlService.Execute();
 
             var downloadUrl = await _storageService.UploadBlobAsync("sqlitefile", "Todo.db",

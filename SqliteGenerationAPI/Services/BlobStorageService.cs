@@ -16,6 +16,20 @@ namespace SqliteGenerationAPI.Services
             _blobClient = storageAccount.CreateCloudBlobClient();
         }
 
+        public async Task<(bool exists, string url)> BlobExistsAsync(string containerName, string blobName)
+        {
+            var container = _blobClient.GetContainerReference(containerName);
+            
+            var blockBlob = container.GetBlockBlobReference(blobName);
+
+            var exists = await blockBlob.ExistsAsync();
+
+            string url = blockBlob.SnapshotQualifiedUri.AbsoluteUri;
+
+            return (exists, exists ? url : string.Empty);
+        }
+
+
         public async Task<string> UploadBlobAsync(string containerName, string blobName, string contentType, Stream source)
         {
             // Get a reference to the container
